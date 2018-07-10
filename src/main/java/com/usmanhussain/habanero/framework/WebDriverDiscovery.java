@@ -11,8 +11,10 @@ import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.ie.InternetExplorerOptions;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -58,7 +60,9 @@ public class WebDriverDiscovery extends EventFiringWebDriver {
             case "safari":
                 return new SafariDriver();
             case "ie":
-                return new InternetExplorerDriver();
+                InternetExplorerOptions options = new InternetExplorerOptions();
+                options.introduceFlakinessByIgnoringSecurityDomains();
+                return new InternetExplorerDriver(options);
             case "chrome":
                 DesiredCapabilities capabilities = DesiredCapabilities.chrome();
                 capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
@@ -66,6 +70,13 @@ public class WebDriverDiscovery extends EventFiringWebDriver {
                     return new ChromeDriver(capabilities);
                 else
                     return new ChromeDriver();
+            case "chrome-docker":
+                ChromeOptions ChromeOptions = new ChromeOptions();
+                String[] chromeOptions = System.getProperty("chromeOptions").split(",");
+                for (String option : chromeOptions) {
+                    ChromeOptions.addArguments(option);
+                }
+                return new ChromeDriver(ChromeOptions);
             case "appium":
                 try {
                     DesiredCapabilities appiumCapabilities = new DesiredCapabilities();
